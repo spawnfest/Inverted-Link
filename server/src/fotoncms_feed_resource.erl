@@ -15,6 +15,7 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
+
 init([]) -> {ok, undefined}.
     
 content_types_provided(ReqData, Context) ->
@@ -25,9 +26,9 @@ to_text(ReqData, Context) ->
     PathInfo = wrq:path_info(ReqData),
     Account = dict:fetch(account, PathInfo),
     Feed = dict:fetch(feed, PathInfo),
-    Item1 = {struct, [{title, <<"Title 1">>}, {content, <<"Hello, folks!">>}]},
-    Item2 = {struct, [{title, <<"Sample">>}, {content, <<"Second post.">>}]},
-    Items = [Item1, Item2],
+    Conn = fotoncms_dal:connect(),
+    {ok, Posts} = fotoncms_dal:get_feed(Conn, Account, Feed),
+    Items = lists:map(fun post_to_item/1, Posts),
     Json = {struct, [{account, list_to_binary(Account)},
 		     {feed, list_to_binary(Feed)},
 		     {items, Items}]},
@@ -59,3 +60,12 @@ is_authorized(ReqData, Context) ->
 expires(ReqData, Context) -> {{{2021,1,1},{0,0,0}}, ReqData, Context}.
 
 generate_etag(ReqData, Context) -> {wrq:raw_path(ReqData), ReqData, Context}.
+
+
+%% utilities
+
+post_to_item(Post) ->
+    {Title} = bson:lookup(title, Post),
+    {Content} = bson:lookup(content, Post),
+    {struct, [{title, Title}, {content, Content}]}.
+

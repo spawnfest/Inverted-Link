@@ -27,6 +27,7 @@ ensure_started(App) ->
 start_link() ->
     ensure_started(inets),
     ensure_started(crypto),
+    ensure_started(mongodb),
     ensure_started(mochiweb),
     application:set_env(webmachine, webmachine_logger_module, 
                         webmachine_logger),
@@ -38,6 +39,7 @@ start_link() ->
 start() ->
     ensure_started(inets),
     ensure_started(crypto),
+    ensure_started(mongodb),
     ensure_started(mochiweb),
     application:set_env(webmachine, webmachine_logger_module, 
                         webmachine_logger),
