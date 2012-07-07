@@ -28,6 +28,7 @@ to_text(ReqData, Context) ->
     Feed = dict:fetch(feed, PathInfo),
     Conn = fotoncms_dal:connect(),
     {ok, Posts} = fotoncms_dal:get_feed(Conn, Account, Feed),
+    fotoncms_dal:disconnect(Conn),
     Items = lists:map(fun post_to_item/1, Posts),
     Json = {struct, [{account, list_to_binary(Account)},
 		     {feed, list_to_binary(Feed)},
