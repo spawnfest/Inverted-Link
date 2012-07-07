@@ -10,7 +10,7 @@
 
 -module(fotoncms_feed_resource).
 -author('Alexander Tchitchigin <at@fosslabs.ru>').
--export([init/1, to_html/2, to_text/2, content_types_provided/2,
+-export([init/1, to_json/2, to_text/2, content_types_provided/2,
          is_authorized/2, generate_etag/2, expires/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
@@ -18,21 +18,25 @@
 init([]) -> {ok, undefined}.
     
 content_types_provided(ReqData, Context) ->
-    {[{"text/html", to_html},{"text/plain",to_text}], ReqData, Context}.
+    {[{"application/json", to_json}, {"text/plain", to_text}], ReqData, Context}.
 
 to_text(ReqData, Context) ->
     Path = wrq:disp_path(ReqData),
     PathInfo = wrq:path_info(ReqData),
     Account = dict:fetch(account, PathInfo),
     Feed = dict:fetch(feed, PathInfo),
-    Body = io_lib:format("Feed ~s for account ~s.~n", [Feed, Account]),
+    Item1 = {struct, [{title, <<"Title 1">>}, {content, <<"Hello, folks!">>}]},
+    Item2 = {struct, [{title, <<"Sample">>}, {content, <<"Second post.">>}]},
+    Items = [Item1, Item2],
+    Json = {struct, [{account, list_to_binary(Account)},
+		     {feed, list_to_binary(Feed)},
+		     {items, Items}]},
+    Body = mochijson2:encode(Json),
     {Body, ReqData, Context}.
 
-to_html(ReqData, Context) ->
+to_json(ReqData, Context) ->
     {Body, _RD, Ctx2} = to_text(ReqData, Context),
-    HBody = io_lib:format("<html><body>~s</body></html>~n",
-                          [erlang:iolist_to_binary(Body)]),
-    {HBody, ReqData, Ctx2}.
+    {Body, ReqData, Ctx2}.
 
 is_authorized(ReqData, Context) ->
     case wrq:disp_path(ReqData) of

@@ -10,7 +10,7 @@ FotonCMS
 Server
 ------
 
-	GET /server/feeds/account/feed
+	GET /<server>/feeds/<account>/<feed>
 
 to access your feed named "feed", for example:
 
