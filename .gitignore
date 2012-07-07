@@ -1,0 +1,6 @@
+.DS_Store
+*.beam
+server/priv/log
+server/deps
+server/rebar
+

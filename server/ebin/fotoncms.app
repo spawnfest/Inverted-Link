@@ -1,0 +1,10 @@
+{application, fotoncms,
+              [{description, "fotoncms"},
+               {vsn, "1"},
+               {modules, [fotoncms, fotoncms_app,
+                          fotoncms_fs_resource, fotoncms_index_resource,
+                          fotoncms_feed_resource, fotoncms_sup]},
+              {registered, []},
+              {applications, [kernel, stdlib, crypto, mochiweb, webmachine]},
+              {mod, {fotoncms_app, []}},
+              {env, []}]}.
