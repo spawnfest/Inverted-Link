@@ -22,7 +22,7 @@ content_types_provided(ReqData, Context) ->
     {[{"application/json", to_json}, {"text/plain", to_text}], ReqData, Context}.
 
 to_text(ReqData, Context) ->
-    Path = wrq:disp_path(ReqData),
+    Callback = wrq:get_qs_value("callback", ReqData),
     PathInfo = wrq:path_info(ReqData),
     Account = dict:fetch(account, PathInfo),
     Feed = dict:fetch(feed, PathInfo),
@@ -33,7 +33,11 @@ to_text(ReqData, Context) ->
     Json = {struct, [{account, list_to_binary(Account)},
 		     {feed, list_to_binary(Feed)},
 		     {items, Items}]},
-    Body = mochijson2:encode(Json),
+    Data = mochijson2:encode(Json),
+    Body = case Callback of
+	       undefined -> Data;
+	       _ -> io_lib:format("~s(~s);", [Callback, iolist_to_binary(Data)])
+	   end,
     {Body, ReqData, Context}.
 
 to_json(ReqData, Context) ->
