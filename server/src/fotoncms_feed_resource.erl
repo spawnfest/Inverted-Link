@@ -11,7 +11,7 @@
 -module(fotoncms_feed_resource).
 -author('Alexander Tchitchigin <at@fosslabs.ru>').
 -export([init/1, to_json/2, to_text/2, content_types_provided/2,
-         is_authorized/2, generate_etag/2, expires/2]).
+         is_authorized/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
 
@@ -29,7 +29,7 @@ to_text(ReqData, Context) ->
     Conn = fotoncms_dal:connect(),
     {ok, Posts} = fotoncms_dal:get_feed(Conn, Account, Feed),
     fotoncms_dal:disconnect(Conn),
-    Items = lists:map(fun post_to_item/1, Posts),
+    Items = lists:map(fun(Doc) -> mongo_to_mochijson2(bson:exclude(['_id'], Doc)) end, Posts),
     Json = {struct, [{account, list_to_binary(Account)},
 		     {feed, list_to_binary(Feed)},
 		     {items, Items}]},
@@ -67,15 +67,28 @@ is_authorized(ReqData, Context) ->
         _ -> {true, ReqData, Context}
     end.
 
-expires(ReqData, Context) -> {{{2021,1,1},{0,0,0}}, ReqData, Context}.
-
-generate_etag(ReqData, Context) -> {wrq:raw_path(ReqData), ReqData, Context}.
-
 
 %% utilities
 
-post_to_item(Post) ->
-    {Title} = bson:lookup(title, Post),
-    {Content} = bson:lookup(content, Post),
-    {struct, [{title, Title}, {content, Content}]}.
+even(N) when is_integer(N) ->
+    N rem 2 =:= 0.
+
+is_bson_object(Value) when is_tuple(Value) ->
+    even(tuple_size(Value));
+is_bson_object(_) ->
+    false.
+
+mongo_to_mochijson2(Document) ->
+    Fun = fun(Label, Value, Acc) ->
+		  %io:format("mongo_to_mochijson2: Label = ~s, Value = ~s~n", [Label, Value]),
+		  Val = case is_bson_object(Value) of
+			    true ->
+				mongo_to_mochijson2(Value);
+			    false ->
+				Value
+			end,
+		  [{Label, Val} | Acc]
+	  end,
+    List = bson:doc_foldr(Fun, [], Document),
+    {struct, List}.
 
