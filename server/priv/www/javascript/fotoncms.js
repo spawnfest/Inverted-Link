@@ -9,10 +9,10 @@
         var itemTempl = options && options.itemTemplate || itemTemplate;
 
         var settings = $.extend({
-            host: 'localhost',
-            port: 8000,
-            account: 'gabriel',
-            feed: 'test'
+            host: '42.149.20.92',
+            port: 80,
+            account: 'fotoncms',
+            feed: 'news'
         }, options);
 
         $.ajax({
