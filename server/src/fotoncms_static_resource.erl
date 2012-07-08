@@ -25,10 +25,10 @@
 
 init(ConfigProps) ->
     {root, Root1} = proplists:lookup(root, ConfigProps),
-    %{ok, App} = application:get_application(),
-    %PrivDir = code:priv_dir(App),
-    {ok, Working} = file:get_cwd(),
-    PrivDir = filename:join([Working, "priv"]),
+    {ok, App} = application:get_application(),
+    PrivDir = code:priv_dir(App),
+    %% {ok, Working} = file:get_cwd(),
+    %% PrivDir = filename:join([Working, "priv"]),
     Root = filename:join([PrivDir, Root1]),
     %io:format("init: PrivDir = ~s, Root = ~s~n", [PrivDir, Root]),
     {ok, #context{root=Root}}.
