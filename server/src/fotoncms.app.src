@@ -6,6 +6,6 @@
                           fotoncms_feed_resource, fotoncms_sup, fotoncms_dal,
 			  fotoncms_static_resource]},
               {registered, []},
-              {applications, [kernel, stdlib, crypto, webmachine, mochiweb, mongodb]},
+              {applications, [kernel, stdlib, crypto, bcrypt, webmachine, mochiweb, mongodb]},
               {mod, {fotoncms_app, []}},
               {env, []}]}.
