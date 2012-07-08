@@ -3,4 +3,7 @@
 server/priv/log
 server/deps
 server/rebar
+server/ebin
+server/rel/files
+server/rel/fotoncms
 

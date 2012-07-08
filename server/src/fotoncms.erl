@@ -27,6 +27,7 @@ ensure_started(App) ->
 start_link() ->
     ensure_started(inets),
     ensure_started(crypto),
+    ensure_started(bcrypt),
     ensure_started(mongodb),
     ensure_started(mochiweb),
     application:set_env(webmachine, webmachine_logger_module, 
@@ -39,6 +40,7 @@ start_link() ->
 start() ->
     ensure_started(inets),
     ensure_started(crypto),
+    ensure_started(bcrypt),
     ensure_started(mongodb),
     ensure_started(mochiweb),
     application:set_env(webmachine, webmachine_logger_module, 
@@ -52,6 +54,8 @@ stop() ->
     Res = application:stop(fotoncms),
     application:stop(webmachine),
     application:stop(mochiweb),
+    application:stop(mongodb),
+    application:stop(bcrypt),
     application:stop(crypto),
     application:stop(inets),
     Res.
