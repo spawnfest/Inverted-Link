@@ -9,7 +9,7 @@
         var itemTempl = options && options.itemTemplate || itemTemplate;
 
         var settings = $.extend({
-            host: '42.149.20.92',
+            host: '46.149.20.92',
             port: 80,
             account: 'fotoncms',
             feed: 'news'
