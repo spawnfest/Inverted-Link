@@ -11,7 +11,7 @@
         var settings = $.extend({
             host: '46.149.20.92',
             port: 80,
-            account: 'fotoncms',
+            account: 'foton',
             feed: 'news'
         }, options);
 
