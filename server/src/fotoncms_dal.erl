@@ -13,7 +13,7 @@
 
 -include_lib("mongodb/include/mongo_protocol.hrl").
 
--export([connect/0, disconnect/1, get_feed/3]).
+-export([connect/0, disconnect/1, get_feed/3, login/3]).
 
 
 -define(MONGODB_HOST, {localhost, 27017}).
@@ -35,3 +35,21 @@ get_feed(Connection, Account, Feed) ->
 						    {}, 0, 10) ),
 		     Posts
 	     end).
+
+login(Connection, Account, Password) ->
+    mongo:do(safe, master, Connection, ?DBNAME,
+	     fun() ->
+		     {Record} = mongo:find_one(accounts, {name, list_to_binary(Account)}),
+		     {Salt} = bson:lookup(salt, Record),
+		     {Hash} = bson:lookup('password_hash', Record),
+		     case {ok, Hash} =:= bcrypt:hashpw(Password, Salt) of
+			 true ->
+			     {ok, gen_auth_token()};
+			 false ->
+			     {error, "Wrong account name or password"}
+		     end
+	     end).
+
+gen_auth_token() ->
+    {ok, Token} = bcrypt:gen_salt(),  % why not?
+    Token.
