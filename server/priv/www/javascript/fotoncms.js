@@ -17,6 +17,8 @@
 
         $.ajax({
             url: 'http://' + settings.host + ':' + settings.port + '/feeds/' + settings.account + '/' + settings.feed,
+            crossDomain: true,
+            dataType: 'jsonp',
             success: function(data) {
                 var content = _.foldl(data.items, function(acc, item) {
                         return acc + _.template(itemTempl, item);
