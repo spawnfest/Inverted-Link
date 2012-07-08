@@ -19,7 +19,7 @@
 init([]) -> {ok, undefined}.
     
 content_types_provided(ReqData, Context) ->
-    {[{"application/json", to_json}, {"text/plain", to_text}], ReqData, Context}.
+    {[{"text/javascript", to_json}, {"application/json", to_json}, {"text/plain", to_text}], ReqData, Context}.
 
 to_text(ReqData, Context) ->
     Callback = wrq:get_qs_value("callback", ReqData),
