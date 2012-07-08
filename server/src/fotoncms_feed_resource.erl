@@ -19,7 +19,7 @@
 init([]) -> {ok, undefined}.
     
 content_types_provided(ReqData, Context) ->
-    {[{"text/javascript", to_json}, {"application/json", to_json}, {"text/plain", to_text}], ReqData, Context}.
+    {[{"application/json", to_json}, {"text/javascript", to_json}, {"text/plain", to_text}], ReqData, Context}.
 
 to_text(ReqData, Context) ->
     Callback = wrq:get_qs_value("callback", ReqData),
@@ -34,11 +34,16 @@ to_text(ReqData, Context) ->
 		     {feed, list_to_binary(Feed)},
 		     {items, Items}]},
     Data = mochijson2:encode(Json),
-    Body = case Callback of
-	       undefined -> Data;
-	       _ -> io_lib:format("~s(~s);", [Callback, iolist_to_binary(Data)])
-	   end,
-    {Body, ReqData, Context}.
+    {Body, ReqData1} = case Callback of
+			   undefined ->
+			       NewRD = wrq:set_resp_header("Content-Type", "application/json", ReqData),
+			       {Data, NewRD};
+			   _ ->
+			       Jsonp = io_lib:format("~s(~s);", [Callback, iolist_to_binary(Data)]),
+			       NewRD = wrq:set_resp_header("Content-Type", "text/javascript", ReqData),
+			       {Jsonp, NewRD}
+		       end,
+    {Body, ReqData1, Context}.
 
 to_json(ReqData, Context) ->
     {Body, _RD, Ctx2} = to_text(ReqData, Context),
