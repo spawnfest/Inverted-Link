@@ -7,12 +7,14 @@
         var fotonElem = this;
 
         var settings = $.extend({
+            host: 'localhost',
+            port: 8000,
             account: 'gabriel',
             feed: 'test'
         }, options);
 
         $.ajax({
-            url: '/feeds/' + settings.account + '/' + settings.feed,
+            url: 'http://' + settings.host + ':' + settings.port + '/feeds/' + settings.account + '/' + settings.feed,
             success: function(data) {
                 var content = _.foldl(data.items, function(acc, item) {
                         return acc + _.template(itemTemplate, item);
