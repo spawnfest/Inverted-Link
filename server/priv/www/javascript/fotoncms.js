@@ -6,6 +6,8 @@
         
         var fotonElem = this;
 
+        var itemTempl = options && options.itemTemplate || itemTemplate;
+
         var settings = $.extend({
             host: 'localhost',
             port: 8000,
@@ -17,7 +19,7 @@
             url: 'http://' + settings.host + ':' + settings.port + '/feeds/' + settings.account + '/' + settings.feed,
             success: function(data) {
                 var content = _.foldl(data.items, function(acc, item) {
-                        return acc + _.template(itemTemplate, item);
+                        return acc + _.template(itemTempl, item);
                     }, '');
 
                 fotonElem.html(content);
